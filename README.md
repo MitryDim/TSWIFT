@@ -2,6 +2,10 @@
 
 This project is a Cloud Development Kit for Terraform (CDKTF) application written in TypeScript. It leverages the power of TypeScript to define and provision cloud infrastructure using Terraform.
 
+> [!NOTE]
+> You will be prompted to enter information about your organization. This information will be included in the certificate.
+
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
@@ -84,8 +88,8 @@ Before you begin, ensure you have met the following requirements:
     openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365
     ```
 
-    > [!NOTE]
-    > You will be prompted to enter information about your organization. This information will be included in the certificate.
+> [!NOTE]
+> You will be prompted to enter information about your organization. This information will be included in the certificate.
 
 
 2. Configure Nginx Proxy Manager to use the generated certificate :
