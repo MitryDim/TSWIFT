@@ -123,7 +123,7 @@ Before you begin, ensure you have met the following requirements:
 
 ## Project Structure
 
-- `Modules/`: Contains Back and Front
+- `Modules/`: Contains the setup containers of the project, Back (Databases, Proxy, Load Balancer) and Front (Prestashop)
 - `main.ts`: The entry point of the CDKTF application.
 - `cdktf.out/`: The output directory for synthesized Terraform configuration.
 
