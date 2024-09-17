@@ -8,21 +8,19 @@ interface FrontProps {
   network: Network;
   envConfig: any;
   variables: Variables;
-
 }
 
 export class Front extends Construct {
   constructor(scope: Construct, id: string, props: FrontProps) {
     super(scope, id);
 
+    //** Setup Prestashop Image */
     const prestashopImage = new Image(this, "prestashopImage", {
       name: "prestashop/prestashop:latest",
       keepLocally: false,
     });
 
-
-
-
+    //** Setup Prestashop */
     new Container(this, "prestashopContainer", {
       name: `prestashop-${props.envConfig.name}`,
       image: prestashopImage.name,
@@ -31,6 +29,12 @@ export class Front extends Construct {
         `DB_NAME=${props.variables.dbName}`,
         `DB_USER=${props.variables.dbUser}`,
         `DB_PASSWD=${props.variables.dbPassword}`,
+      ],
+      volumes: [
+        {
+          containerPath: "/var/www/html",
+          volumeName: `prestashop-data-${props.envConfig.name}`,
+        },
       ],
       networksAdvanced: [
         {
