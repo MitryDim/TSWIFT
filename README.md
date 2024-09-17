@@ -2,10 +2,6 @@
 
 This project is a Cloud Development Kit for Terraform (CDKTF) application written in TypeScript. It leverages the power of TypeScript to define and provision cloud infrastructure using Terraform.
 
-> [!NOTE]
-> You will be prompted to enter information about your organization. This information will be included in the certificate.
-
-
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
@@ -94,35 +90,36 @@ Before you begin, ensure you have met the following requirements:
 
 2. Configure Nginx Proxy Manager to use the generated certificate :
 
-    Deploy stack
+   * Deploy stack
 
-    ```sh
-    cdktf deploy dev --auto-approve
-    ```
+   <br>
 
-    Go to **[localhost:81](localhost:81)**
+   ```sh
+   cdktf deploy dev --auto-approve
+   ```
 
-   Log in with these credentials :
+   * Go to **[localhost:81](localhost:81)**
+
+   * Log In with these credentials :
 
    ```sh
    email: admin@example.com
    password: changeme
    ```
-   - [ ] Add delight to the experience when all tasks are complete
 
-   Navigate to the SSL Certificates section in the Nginx Proxy Manager dashboard.
+   * Navigate to the SSL Certificates section in the Nginx Proxy Manager dashboard.
 
-   Click on "Add SSL Certificate" and select "Custom".
+   * Click on "Add SSL Certificate" and select "Custom".
 
-   Upload the `.key` and `.crt` files.
+   * Upload the `.key` and `.crt` files.
 
-Apply the certificate to your proxy hosts:
-Go to the Hosts section and edit the proxy host you want to secure.
+   3. Create a Proxy Host:
 
-      - Save the changes.
-
-- Your Nginx Proxy Manager should now be configured to use the self-signed certificate.
-  Under the SSL tab, select the newly added certificate.
+      * Navigate to the "Proxy Hosts" section in the Nginx Proxy Manager dashboard.
+      * Click on "Add Proxy Host".
+      * Fill in the details for your domain name and forward hostname/IP.
+      * Select the "SSL" tab and enable SSL by selecting the certificate you uploaded earlier.
+      * Save the proxy host configuration.
 
 ## Project Structure
 
