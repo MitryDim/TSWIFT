@@ -24,7 +24,7 @@ export class Front extends Construct {
 
 
     new Container(this, "prestashopContainer", {
-      name: "prestashop",
+      name: `prestashop-${props.envConfig.name}`,
       image: prestashopImage.name,
       env: [
         `DB_SERVER=db-${props.envConfig.name}`,
