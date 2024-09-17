@@ -20,7 +20,7 @@ export class Variables {
   public readonly dbName: TerraformVariable;
 
   constructor(scope : Construct) {
-       this.dbPassword = new TerraformVariable(scope, "mysql_password", {
+       this.dbPassword = new TerraformVariable(scope, "db_password", {
          description: "The password for the WordPress database user",
          sensitive: true,
          type: VariableType.STRING,
@@ -32,13 +32,13 @@ export class Variables {
           type: VariableType.STRING,
         });
 
-        this.rootPassword = new TerraformVariable(scope, "mysql_root_password", {
+        this.rootPassword = new TerraformVariable(scope, "db_root_password", {
           description: "The root password for MariaDB",
           sensitive: true,
           type: VariableType.STRING,
         });
 
-        this.dbName = new TerraformVariable(scope, "mysql_db_name", {
+        this.dbName = new TerraformVariable(scope, "db_name", {
           description: "The name of the database",
           sensitive: false,
           type: VariableType.STRING,
