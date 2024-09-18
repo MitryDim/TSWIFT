@@ -22,11 +22,21 @@ export class Front extends Construct {
       keepLocally: true,
     });
 
-  
-    for (let i = 1; i <= props.replicas; i++) {
-        const sharedVolume = new Volume(this, `prestashopSharedVolume${i}`, {
-          name: `prestashop-data${i}`,
-        });
+    // Définir l'image Redis
+    const redisImage = new Image(this, "redis_image", {
+      name: "redis:latest",
+    });
+
+    // Créer un conteneur Redis
+    new Container(this, "redis_container", {
+      name: "redis",
+      image: redisImage.name,
+      networksAdvanced: [{ name: props.network.name }],
+    });
+    const sharedVolume = new Volume(this, `prestashopSharedVolume`, {
+      name: `prestashop-data`,
+    });
+    for (let i = 1; i <= 2; i++) {
       const port = 8080 + i;
       new Container(this, `prestashopContainer${i}`, {
         name: `prestashop-${props.envConfig.name}-${i}`,
@@ -43,16 +53,13 @@ export class Front extends Construct {
           "DB_PREFIX=ps_",
           "PS_LANGUAGE=fr",
           "PS_COUNTRY=fr",
-          "PS_DEV_MODE=1",
-          "PS_FOLDER_ADMIN=admin-dev",
-          "PS_FOLDER_INSTALL=install-dev",
-          "PS_DOMAIN=localhost:" + port,
-          "PS_HANDLE_DYNAMIC_DOMAIN=1",
+          "PS_DEV_MODE=0",
+          "PS_DOMAIN=localhost:8081",
           "ADMIN_PASSWD=test@test.com",
           "ADMIN_MAIL=test@test.com",
-          // Ajout de la configuration spécifique pour la deuxième instance
+          "PS_HOST_MODE=0", 
           `PS_SHOP_ID=${i === 1 ? "1" : "2"}`, // Différent pour chaque instance
-          `PS_SHOP_MAIN=${i === 1 ? "1" : "0"}`, // La première instance est la principale
+          `PS_SHOP_MAIN=${i === 1 ? "1" : "0"}`, // La première instance est la principale,
         ],
         networksAdvanced: [
           {
