@@ -23,11 +23,23 @@ export class Back extends Construct {
     const configDir = dirname(configPath);
     mkdirSync(configDir, { recursive: true });
 
+    const configPath = join(__dirname, "config/maxscale.cnf");
+    // Créez le répertoire si nécessaire
+    const configDir = dirname(configPath);
+    mkdirSync(configDir, { recursive: true });
+
+    //** Setup Database Image */
     const dbImage = new Image(this, "dbImage", {
       name: "mariadb:latest",
       keepLocally: true,
     });
 
+    //** Setup Nginx Image */
+    const nginxImage = new Image(this, "nginxImage", {
+      name: "nginx:latest",
+    });
+
+    //** Setup Database */
     const dbMasterVolume = new Volume(this, "dbMasterVolume", {
       name: "db-master-volume",
     });
@@ -67,88 +79,37 @@ export class Back extends Construct {
           internal: 3306,
         },
       ],
-      command: ["--server-id=1", "--log-bin=mysql-bin", "--binlog-format=row"],
     });
 
-   for (let i = 1; i <= 3; i++) {
-     const dbSlaveVolume = new Volume(this, `dbSlaveVolume${i}`, {
-       name: `db-slave-volume${i}`,
-     });
-const port = 3307 + i;
-     new Container(this, `dbSlaveContainer${i}`, {
-       name: `db-slave-${props.envConfig.name}${i}`,
-       image: dbImage.name,
-       env: [
-         `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
-         `MYSQL_DATABASE=${props.variables.dbName}`,
-         `MYSQL_USER=${props.variables.dbUser}`,
-         `MYSQL_PASSWORD=${props.variables.dbPassword}`,
-       ],
-       volumes: [
-         {
-           volumeName: dbSlaveVolume.name,
-           containerPath: "/var/lib/mysql",
-         },
-       ],
-       networksAdvanced: [
-         {
-           name: props.network.name,
-         },
-       ],
-       ports: [
-         {
-           internal: port,
-         },
-       ],
-       command: [
-         "--server-id=" + (i + 1),
-         "--log-bin=mysql-bin",
-         "--binlog-format=row",
-         "--relay-log=relay-bin",
-         "--port=" + port,
-       ],
-     });
-   }
-
-    // Generate MaxScale configuration
-    const config = generateMaxScaleConfig({
-      masterHost: `db-master-${props.envConfig.name}`,
-      slaveHosts: [
-        `db-slave-${props.envConfig.name}1`,
-        `db-slave-${props.envConfig.name}2`,
-        `db-slave-${props.envConfig.name}3`,
+    //** Setup Nginx */
+    new Container(this, "nginxContainer", {
+      name: `nginx-${props.envConfig.name}`,
+      image: nginxImage.name,
+      volumes: [
+        {
+          containerPath: "/etc/nginx/ssl",
+          hostPath: "../../certs/",
+          volumeName: `nginx-ssl-${props.envConfig.name}`,
+        },
+        {
+          containerPath: "/etc/nginx/conf.d",
+          volumeName: `nginx-conf-${props.envConfig.name}`,
+        },
       ],
-      maxscaleUser: "admin",
-      maxscalePassword: "prestashop",
-    });
-
-    writeFileSync(configPath, config);
-
-    new Container(this, "maxscaleContainer", {
-      name: "maxscale",
-      image: maxscaleImage.name,
-      env: ["MAXSCALE_USER=admin", "MAXSCALE_PASSWORD=prestashop"],
       networksAdvanced: [
         {
           name: props.network.name,
         },
       ],
-      volumes: [
-        {
-          volumeName: maxscaleVolume.name,
-          hostPath: configPath, // Chemin du fichier sur votre hôte
-          containerPath: "/etc", //Chemin du fichier dans le conteneur
-        },
-      ],
       ports: [
         {
-          internal: 3307
-        },
-        {
-          internal: 8989, // Port interne de l'interface web
-          external: 8989, // Port externe sur l'hôte
+          internal: 80,
+          external: 80,
         },
       ],
     });
+
+
+
   }
 }

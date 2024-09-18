@@ -16,6 +16,7 @@ export class Front extends Construct {
   constructor(scope: Construct, id: string, props: FrontProps) {
     super(scope, id);
 
+    //** Setup Prestashop Image */
     const prestashopImage = new Image(this, "prestashopImage", {
       name: "prestashop/prestashop:latest",
       keepLocally: true,
