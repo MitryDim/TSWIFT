@@ -17,13 +17,11 @@ export class Back extends Construct {
     //** Setup Database Image */
     const dbImage = new Image(this, "dbImage", {
       name: "mariadb:latest",
-      keepLocally: false,
     });
 
-    //** Setup Nginx Proxy Manager Image */
-    const npmImage = new Image(this, "npmImage", {
-      name: "jc21/nginx-proxy-manager:latest",
-      keepLocally: false,
+    //** Setup Nginx Image */
+    const nginxImage = new Image(this, "nginxImage", {
+      name: "nginx:latest",
     });
 
     //** Setup Database */
@@ -54,30 +52,19 @@ export class Back extends Construct {
       ],
     });
 
-    //** Setup Nginx Proxy Manager */
-    new Container(this, "nginx-proxy-manager", {
-      image: npmImage.name,
-      name: `nginx-proxy-manager-${props.envConfig.name}`,
-      ports: [
-        { internal: 81, external: 81 },
-        { internal: 443, external: 443 },
-      ],
-      restart: "unless-stopped",
-      env: [
-        `DB_MYSQL_HOST=db-${props.envConfig.name}`,
-        "DB_MYSQL_PORT=3306",
-        `DB_MYSQL_USER=${props.variables.dbUser}`,
-        `DB_MYSQL_PASSWORD=${props.variables.dbPassword}`,
-        `DB_MYSQL_NAME=${props.variables.dbName}`,
-      ],
+    //** Setup Nginx */
+    new Container(this, "nginxContainer", {
+      name: `nginx-${props.envConfig.name}`,
+      image: nginxImage.name,
       volumes: [
         {
-          containerPath: "/data",
-          volumeName: `npm-data-${props.envConfig.name}`,
+          containerPath: "/etc/nginx/ssl",
+          hostPath: "../../certs/",
+          volumeName: `nginx-ssl-${props.envConfig.name}`,
         },
         {
-          containerPath: "/etc/letsencrypt",
-          volumeName: `npm-letsencrypt-${props.envConfig.name}`,
+          containerPath: "/etc/nginx/conf.d",
+          volumeName: `nginx-conf-${props.envConfig.name}`,
         },
       ],
       networksAdvanced: [
@@ -85,6 +72,15 @@ export class Back extends Construct {
           name: props.network.name,
         },
       ],
+      ports: [
+        {
+          internal: 80,
+          external: 80,
+        },
+      ],
     });
+
+
+
   }
 }
