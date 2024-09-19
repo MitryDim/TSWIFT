@@ -184,6 +184,10 @@ export class Back extends Construct {
           internal: 80,
           external: 80,
         },
+        {
+          internal: 443,
+          external: 443,
+        },
       ],
     });
   }

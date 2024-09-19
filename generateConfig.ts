@@ -39,6 +39,7 @@ servers=server1,${props.slaveHosts
 user=${props.maxscaleUser}
 password=${props.maxscalePassword}
 
+
 [Read-Write-Service]
 type=service
 router=readwritesplit
