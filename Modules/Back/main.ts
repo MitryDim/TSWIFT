@@ -7,6 +7,7 @@ import { Volume } from "../../.gen/providers/docker/volume";
 import { mkdirSync, writeFileSync } from "fs";
 import { generateMaxScaleConfig } from "../../generateConfig";
 import { dirname, join } from "path";
+import path = require("path");
 
 interface BackProps {
   network: Network;
@@ -23,7 +24,6 @@ export class Back extends Construct {
     const configDir = dirname(configPath);
     mkdirSync(configDir, { recursive: true });
 
-  
     //** Setup Database Image */
     const dbImage = new Image(this, "dbImage", {
       name: "mariadb:latest",
@@ -36,131 +36,129 @@ export class Back extends Construct {
     });
 
     //** Setup Database */
-       const dbMasterVolume = new Volume(this, "dbMasterVolume", {
-         name: "db-master-volume",
-       });
+    const dbMasterVolume = new Volume(this, "dbMasterVolume", {
+      name: "db-master-volume",
+    });
 
-       const maxscaleVolume = new Volume(this, "maxscaleVolume", {
-         name: "maxscale-volume",
-       });
+    const maxscaleImage = new Image(this, "maxscaleImage", {
+      name: "mariadb/maxscale:latest",
+      keepLocally: true,
+    });
 
-       const maxscaleImage = new Image(this, "maxscaleImage", {
-         name: "mariadb/maxscale:latest",
-         keepLocally: true,
-       });
+    const initSQL = path.resolve(__dirname, "./config/init.sql");
+    new Container(this, "dbContainer", {
+      name: `db-master-${props.envConfig.name}`,
+      image: dbImage.name,
+      env: [
+        `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
+        `MYSQL_DATABASE=${props.variables.dbName}`,
+        `MYSQL_USER=${props.variables.dbUser}`,
+        `MYSQL_PASSWORD=${props.variables.dbPassword}`,
+      ],
+      networksAdvanced: [
+        {
+          name: props.network.name,
+        },
+      ],
+      volumes: [
+        {
+          volumeName: dbMasterVolume.name,
+          containerPath: "/var/lib/mysql",
+        },
+        {
+          hostPath: initSQL, // Emplacement local du fichier SQL
+          containerPath: "/docker-entrypoint-initdb.d/init.sql", // Chemin à l'intérieur du conteneur
+        },
+      ],
+      ports: [
+        {
+          internal: 3306,
+        },
+      ],
+      command: ["--server-id=1", "--log-bin=mysql-bin", "--binlog-format=row"],
+    });
 
-       new Container(this, "dbContainer", {
-         name: `db-master-${props.envConfig.name}`,
-         image: dbImage.name,
-         env: [
-           `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
-           `MYSQL_DATABASE=${props.variables.dbName}`,
-           `MYSQL_USER=${props.variables.dbUser}`,
-           `MYSQL_PASSWORD=${props.variables.dbPassword}`,
-         ],
-         networksAdvanced: [
-           {
-             name: props.network.name,
-           },
-         ],
-         volumes: [
-           {
-             volumeName: dbMasterVolume.name,
-             containerPath: "/var/lib/mysql",
-           },
-         ],
-         ports: [
-           {
-             internal: 3306,
-           },
-         ],
-         command: [
-           "--server-id=1",
-           "--log-bin=mysql-bin",
-           "--binlog-format=row",
-         ],
-       });
+    for (let i = 1; i <= 3; i++) {
+      const dbSlaveVolume = new Volume(this, `dbSlaveVolume${i}`, {
+        name: `db-slave-volume${i}`,
+      });
+      new Container(this, `dbSlaveContainer${i}`, {
+        name: `db-slave-${props.envConfig.name}${i}`,
+        image: dbImage.name,
+        env: [
+          `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
+          `MYSQL_DATABASE=${props.variables.dbName}`,
+          `MYSQL_USER=${props.variables.dbUser}`,
+          `MYSQL_PASSWORD=${props.variables.dbPassword}`,
+        ],
+        volumes: [
+          {
+            volumeName: dbSlaveVolume.name,
+            containerPath: "/var/lib/mysql",
+          },
+        ],
+        networksAdvanced: [
+          {
+            name: props.network.name,
+          },
+        ],
+        ports: [
+          {
+            internal: 3306,
+          },
+        ],
+        command: [
+          "--server-id=" + (i + 1),
+          "--log-bin=mysql-bin",
+          "--binlog-format=row",
+          "--relay-log=relay-bin",
+        ],
+      });
+    }
 
-       for (let i = 1; i <= 3; i++) {
-         const dbSlaveVolume = new Volume(this, `dbSlaveVolume${i}`, {
-           name: `db-slave-volume${i}`,
-         });
-         const port = 3307 + i;
-         new Container(this, `dbSlaveContainer${i}`, {
-           name: `db-slave-${props.envConfig.name}${i}`,
-           image: dbImage.name,
-           env: [
-             `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
-             `MYSQL_DATABASE=${props.variables.dbName}`,
-             `MYSQL_USER=${props.variables.dbUser}`,
-             `MYSQL_PASSWORD=${props.variables.dbPassword}`,
-           ],
-           volumes: [
-             {
-               volumeName: dbSlaveVolume.name,
-               containerPath: "/var/lib/mysql",
-             },
-           ],
-           networksAdvanced: [
-             {
-               name: props.network.name,
-             },
-           ],
-           ports: [
-             {
-               internal: port,
-             },
-           ],
-           command: [
-             "--server-id=" + (i + 1),
-             "--log-bin=mysql-bin",
-             "--binlog-format=row",
-             "--relay-log=relay-bin",
-             "--port=" + port,
-           ],
-         });
-       }
+    // Generate MaxScale configuration
+    const config = generateMaxScaleConfig({
+      masterHost: `db-master-${props.envConfig.name}`,
+      slaveHosts: [
+        `db-slave-${props.envConfig.name}1`,
+        `db-slave-${props.envConfig.name}2`,
+        `db-slave-${props.envConfig.name}3`,
+      ],
+      maxscaleUser: "admin",
+      maxscalePassword: "prestashop",
+    });
 
-       // Generate MaxScale configuration
-       const config = generateMaxScaleConfig({
-         masterHost: `db-master-${props.envConfig.name}`,
-         slaveHosts: [
-           `db-slave-${props.envConfig.name}1`,
-           `db-slave-${props.envConfig.name}2`,
-           `db-slave-${props.envConfig.name}3`,
-         ],
-         maxscaleUser: "admin",
-         maxscalePassword: "prestashop",
-       });
+    writeFileSync(configPath, config);
 
-       writeFileSync(configPath, config);
+    new Container(this, "maxscaleContainer", {
+      name: "maxscale",
+      image: maxscaleImage.name,
+      env: ["MAXSCALE_USER=admin", "MAXSCALE_PASSWORD=prestashop"],
+      networksAdvanced: [
+        {
+          name: props.network.name,
+        },
+      ],
+      volumes: [
+        {
+          hostPath: configPath, // Chemin du fichier sur votre hôte
+          containerPath: "/etc/maxscale.cnf", //Chemin du fichier dans le conteneur
+        },
+      ],
+      ports: [
+        {
+          internal: 3307,
+        },
+        {
+          internal: 8989, // Port interne de l'interface web
+          external: 8989, // Port externe sur l'hôte
+        },
+      ],
+    });
 
-       new Container(this, "maxscaleContainer", {
-         name: "maxscale",
-         image: maxscaleImage.name,
-         env: ["MAXSCALE_USER=admin", "MAXSCALE_PASSWORD=prestashop"],
-         networksAdvanced: [
-           {
-             name: props.network.name,
-           },
-         ],
-         volumes: [
-           {
-             volumeName: maxscaleVolume.name,
-             hostPath: configPath, // Chemin du fichier sur votre hôte
-             containerPath: "/etc", //Chemin du fichier dans le conteneur
-           },
-         ],
-         ports: [
-           {
-             internal: 3307,
-           },
-           {
-             internal: 8989, // Port interne de l'interface web
-             external: 8989, // Port externe sur l'hôte
-           },
-         ],
-       });
+    //** Setup Nginx */
+    const certsPath = path.resolve(__dirname, "../../certs/");
+    const nginxConfPath = path.resolve(__dirname, "./config/nginx.conf");
 
     //** Setup Nginx */
     new Container(this, "nginxContainer", {
@@ -168,13 +166,12 @@ export class Back extends Construct {
       image: nginxImage.name,
       volumes: [
         {
-          containerPath: "/etc/nginx/ssl",
-          hostPath: "../../certs/",
-          volumeName: `nginx-ssl-${props.envConfig.name}`,
+          containerPath: "/etc/nginx/ssl", // Le chemin dans le conteneur Nginx
+          hostPath: certsPath, // Dossier local contenant tes certificats
         },
         {
-          containerPath: "/etc/nginx/conf.d",
-          volumeName: `nginx-conf-${props.envConfig.name}`,
+          containerPath: "/etc/nginx/nginx.conf",
+          hostPath: nginxConfPath,
         },
       ],
       networksAdvanced: [
@@ -189,8 +186,5 @@ export class Back extends Construct {
         },
       ],
     });
-
-
-
   }
 }

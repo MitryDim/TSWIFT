@@ -9,6 +9,8 @@ export function generateMaxScaleConfig(props: MaxScaleConfigProps): string {
   return `
 [maxscale]
 threads=auto
+admin_secure_gui=false
+admin_host=0.0.0.0
 
 [server1]
 type=server
@@ -22,7 +24,7 @@ ${props.slaveHosts
 [server${index + 2}]
 type=server
 address=${host}
-port=3307${index + 1}
+port=3306
 protocol=MariaDBBackend
 `
   )
@@ -45,11 +47,12 @@ servers=server1,${props.slaveHosts
     .join(",")}
 user=${props.maxscaleUser}
 password=${props.maxscalePassword}
+localhost_match_wildcard_host=false
 
 [Read-Write-Listener]
 type=listener
 service=Read-Write-Service
 protocol=MariaDBClient
-port=3306
+port=3307
 `;
 }
