@@ -16,6 +16,7 @@ interface BackProps {
 }
 
 export class Back extends Construct {
+  public readonly maxscaleContainer: Container;
   constructor(scope: Construct, id: string, props: BackProps) {
     super(scope, id);
 
@@ -46,14 +47,12 @@ export class Back extends Construct {
     });
 
     const initSQL = path.resolve(__dirname, "./config/init.sql");
-    new Container(this, "dbContainer", {
+    this.maxscaleContainer = new Container(this, "dbContainer", {
       name: `db-master-${props.envConfig.name}`,
       image: dbImage.name,
       env: [
         `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
-        `MYSQL_DATABASE=${props.variables.dbName}`,
-        `MYSQL_USER=${props.variables.dbUser}`,
-        `MYSQL_PASSWORD=${props.variables.dbPassword}`,
+        `MYSQL_DATABASE=${props.variables.dbName}`
       ],
       networksAdvanced: [
         {
@@ -80,8 +79,7 @@ export class Back extends Construct {
         "--log-bin=mysql-bin",
         "--binlog-format=row",
         "--gtid-domain-id=1",
-        "--log-slave-updates=1",
-        "--replicate_do_db=prestashop",
+        "--log-slave-updates=1"
       ],
     });
 
@@ -94,9 +92,7 @@ export class Back extends Construct {
         image: dbImage.name,
         env: [
           `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
-          `MYSQL_DATABASE=${props.variables.dbName}`,
-          `MYSQL_USER=${props.variables.dbUser}`,
-          `MYSQL_PASSWORD=${props.variables.dbPassword}`,
+          `MYSQL_DATABASE=${props.variables.dbName}`
         ],
         volumes: [
           {
@@ -126,7 +122,6 @@ export class Back extends Construct {
           "--gtid-domain-id=" + (i + 1),
           "--log-slave-updates=1",
           "--read-only=1",
-          "--replicate_do_db=prestashop"
         ],
       });
     }
@@ -145,7 +140,7 @@ export class Back extends Construct {
 
     writeFileSync(configPath, config);
 
-    new Container(this, "maxscaleContainer", {
+   new Container(this, "maxscaleContainer", {
       name: "maxscale",
       image: maxscaleImage.name,
       env: ["MAXSCALE_USER=maxscale_admin", "MAXSCALE_PASSWORD=secret"],
@@ -169,6 +164,12 @@ export class Back extends Construct {
           external: 8989, // Port externe sur l'hôte
         },
       ],
+      healthcheck: {
+        test: ["CMD", "maxctrl", "list", "servers"],
+        interval: "10s", // Augmentez l'intervalle si nécessaire
+        timeout: "20s", // Augmentez le délai d'attente si nécessaire
+        retries: 10, // Augmentez le nombre de tentatives si nécessaire
+      },
     });
 
     //** Setup Nginx */

@@ -10,6 +10,7 @@ interface FrontProps {
   envConfig: any;
   variables: Variables;
   replicas: number;
+  maxscaleContainer: Container;
 }
 
 export class Front extends Construct {
@@ -60,7 +61,7 @@ export class Front extends Construct {
           "ADMIN_PASSWD=test@test.com",
           "ADMIN_MAIL=test@test.com",
           "PS_HOST_MODE=0",
-        ],
+        ], // Délai de 30 secondes pour attendre que MaxScale soit prêt
         networksAdvanced: [
           {
             name: props.network.name,
@@ -79,6 +80,7 @@ export class Front extends Construct {
           },
         ],
         restart: "always",
+        dependsOn: [props.maxscaleContainer],
       });
     }
   }

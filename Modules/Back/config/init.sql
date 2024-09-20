@@ -1,5 +1,5 @@
 CREATE USER IF NOT EXISTS 'maxscale_admin'@'%' IDENTIFIED BY 'secret';
-
+CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY 'prestashop';
 GRANT SELECT ON mysql.user TO 'maxscale_admin'@'%';
 GRANT SELECT ON mysql.db TO 'maxscale_admin'@'%';
 GRANT SELECT ON mysql.tables_priv TO 'maxscale_admin'@'%';
@@ -21,7 +21,7 @@ GRANT BINLOG ADMIN ON *.* TO 'maxscale_monitor'@'%';
 GRANT REPLICATION SLAVE ADMIN ON *.* TO 'maxscale_monitor'@'%';
 FLUSH PRIVILEGES;
 
-GRANT ALL on prestashop.* to 'admin'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%';
 FLUSH PRIVILEGES;
 
 

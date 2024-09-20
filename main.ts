@@ -19,13 +19,14 @@ class MyStack extends TerraformStack {
     //Init variables :
     const variables = new Variables(this);
 
-    new Back(this, "back", { network, envConfig, variables });
+    const back = new Back(this, "back", { network, envConfig, variables });
 
     new Front(this, "front", {
       network,
       envConfig,
       variables,
       replicas: 2, // Définissez le nombre de réplicas souhaité
+      maxscaleContainer: back.maxscaleContainer,
     });
   }
 }
