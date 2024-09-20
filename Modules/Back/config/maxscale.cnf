@@ -34,16 +34,18 @@ protocol=MariaDBBackend
 type=monitor
 module=mariadbmon
 servers=server1,server2,server3,server4
-user=admin
-password=prestashop
+user=maxscale_monitor
+password=secret
+auto_rejoin=true
+enforce_read_only_slaves = true
 
 
 [Read-Write-Service]
 type=service
 router=readwritesplit
 servers=server1,server2,server3,server4
-user=admin
-password=prestashop
+user=maxscale_admin
+password=secret
 localhost_match_wildcard_host=false
 
 [Read-Write-Listener]

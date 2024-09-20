@@ -36,8 +36,10 @@ module=mariadbmon
 servers=server1,${props.slaveHosts
     .map((_, index) => `server${index + 2}`)
     .join(",")}
-user=${props.maxscaleUser}
-password=${props.maxscalePassword}
+user=maxscale_monitor
+password=secret
+auto_rejoin=true
+enforce_read_only_slaves = true
 
 
 [Read-Write-Service]

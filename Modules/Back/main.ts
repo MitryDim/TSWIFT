@@ -75,7 +75,14 @@ export class Back extends Construct {
           internal: 3306,
         },
       ],
-      command: ["--server-id=1", "--log-bin=mysql-bin", "--binlog-format=row"],
+      command: [
+        "--server-id=1",
+        "--log-bin=mysql-bin",
+        "--binlog-format=row",
+        "--gtid-domain-id=1",
+        "--log-slave-updates=1",
+        "--replicate_do_db=prestashop",
+      ],
     });
 
     for (let i = 1; i <= 3; i++) {
@@ -96,6 +103,10 @@ export class Back extends Construct {
             volumeName: dbSlaveVolume.name,
             containerPath: "/var/lib/mysql",
           },
+          {
+            hostPath: initSQL, // Emplacement local du fichier SQL
+            containerPath: "/docker-entrypoint-initdb.d/init.sql", // Chemin à l'intérieur du conteneur
+          },
         ],
         networksAdvanced: [
           {
@@ -112,6 +123,10 @@ export class Back extends Construct {
           "--log-bin=mysql-bin",
           "--binlog-format=row",
           "--relay-log=relay-bin",
+          "--gtid-domain-id=" + (i + 1),
+          "--log-slave-updates=1",
+          "--read-only=1",
+          "--replicate_do_db=prestashop"
         ],
       });
     }
@@ -124,8 +139,8 @@ export class Back extends Construct {
         `db-slave-${props.envConfig.name}2`,
         `db-slave-${props.envConfig.name}3`,
       ],
-      maxscaleUser: "admin",
-      maxscalePassword: "prestashop",
+      maxscaleUser: "maxscale_admin",
+      maxscalePassword: "secret",
     });
 
     writeFileSync(configPath, config);
@@ -133,7 +148,7 @@ export class Back extends Construct {
     new Container(this, "maxscaleContainer", {
       name: "maxscale",
       image: maxscaleImage.name,
-      env: ["MAXSCALE_USER=admin", "MAXSCALE_PASSWORD=prestashop"],
+      env: ["MAXSCALE_USER=maxscale_admin", "MAXSCALE_PASSWORD=secret"],
       networksAdvanced: [
         {
           name: props.network.name,
@@ -189,6 +204,7 @@ export class Back extends Construct {
           external: 443,
         },
       ],
+      restart: "always",
     });
   }
 }
