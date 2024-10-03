@@ -23,17 +23,17 @@ export class Front extends Construct {
       keepLocally: true,
     });
 
-    // Définir l'image Redis
-    const redisImage = new Image(this, "redis_image", {
-      name: "redis:latest",
-    });
+    // // Définir l'image Redis
+    // const redisImage = new Image(this, "redis_image", {
+    //   name: "redis:latest",
+    // });
 
-    // Créer un conteneur Redis
-    new Container(this, "redis_container", {
-      name: "redis",
-      image: redisImage.name,
-      networksAdvanced: [{ name: props.network.name }],
-    });
+    // // Créer un conteneur Redis
+    // new Container(this, "redis_container", {
+    //   name: "redis",
+    //   image: redisImage.name,
+    //   networksAdvanced: [{ name: props.network.name }],
+    // });
     const sharedVolume = new Volume(this, `prestashopSharedVolume`, {
       name: `prestashop-data`,
     });

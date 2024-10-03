@@ -209,16 +209,26 @@ export class Back extends Construct {
       restart: "always",
     });
 
-    //** Setup Debian Image for Siege */
-    const siegeImage = new Image(this, "siegeImage", {
-      name: "debian:latest",
+    //** Setup K6 Benchmark */
+    const k6Image = new Image(this, "k6-image", {
+      name: "grafana/k6:latest",
+      keepLocally: true,
     });
 
-    //** Setup Siege Container */
-    new Container(this, "siegeContainer", {
-      name: `siege-${props.envConfig.name}`,
-      image: siegeImage.name, // Utilise une image Alpine légère
-      restart: "unless-stopped",
+    new Container(this, "k6-container", {
+      image: k6Image.name,
+      name: `k6-${props.envConfig.name}`,
+      restart: "always",
+      volumes: [
+        {
+          hostPath: path.resolve(__dirname, "./config/k6-bench.js"),
+          containerPath: "/scripts/k6-bench.js",
+        },
+        {
+          containerPath: "/etc/ssl/certs", // Le chemin dans le conteneur Nginx
+          hostPath: certsPath, // Dossier local contenant tes certificats
+        },
+      ],
       networksAdvanced: [
         {
           name: props.network.name,
@@ -226,14 +236,11 @@ export class Back extends Construct {
       ],
       ports: [
         {
-          internal: 8083,
+          internal: 6565,
+          external: 6565,
         },
       ],
-      command: [
-        "sh",
-        "-c",
-        `apt-get update && apt-get install -y siege && sleep 30 && siege -c 10 -t 30S https://tswift.local:443`,
-      ],
+      command: ["run", "/scripts/k6-bench.js"],
     });
   }
 }
