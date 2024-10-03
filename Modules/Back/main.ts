@@ -25,22 +25,23 @@ export class Back extends Construct {
     const configDir = dirname(configPath);
     mkdirSync(configDir, { recursive: true });
 
+    //** Setup Database Volume*/
+    const dbMasterVolume = new Volume(this, "dbMasterVolume", {
+      name: "db-master-volume",
+    });
+
     //** Setup Database Image */
     const dbImage = new Image(this, "dbImage", {
       name: "mariadb:latest",
       keepLocally: true,
     });
 
-    //** Setup Nginx Image */
+    //** Nginx Image */
     const nginxImage = new Image(this, "nginxImage", {
       name: "nginx:latest",
     });
 
-    //** Setup Database */
-    const dbMasterVolume = new Volume(this, "dbMasterVolume", {
-      name: "db-master-volume",
-    });
-
+    //** MaxScale Image */
     const maxscaleImage = new Image(this, "maxscaleImage", {
       name: "mariadb/maxscale:latest",
       keepLocally: true,
@@ -52,7 +53,7 @@ export class Back extends Construct {
       image: dbImage.name,
       env: [
         `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
-        `MYSQL_DATABASE=${props.variables.dbName}`
+        `MYSQL_DATABASE=${props.variables.dbName}`,
       ],
       networksAdvanced: [
         {
@@ -79,7 +80,7 @@ export class Back extends Construct {
         "--log-bin=mysql-bin",
         "--binlog-format=row",
         "--gtid-domain-id=1",
-        "--log-slave-updates=1"
+        "--log-slave-updates=1",
       ],
     });
 
@@ -92,7 +93,7 @@ export class Back extends Construct {
         image: dbImage.name,
         env: [
           `MYSQL_ROOT_PASSWORD=${props.variables.rootPassword}`,
-          `MYSQL_DATABASE=${props.variables.dbName}`
+          `MYSQL_DATABASE=${props.variables.dbName}`,
         ],
         volumes: [
           {
@@ -140,7 +141,7 @@ export class Back extends Construct {
 
     writeFileSync(configPath, config);
 
-   new Container(this, "maxscaleContainer", {
+    new Container(this, "maxscaleContainer", {
       name: "maxscale",
       image: maxscaleImage.name,
       env: ["MAXSCALE_USER=maxscale_admin", "MAXSCALE_PASSWORD=secret"],
@@ -206,6 +207,33 @@ export class Back extends Construct {
         },
       ],
       restart: "always",
+    });
+
+    //** Setup Debian Image for Siege */
+    const siegeImage = new Image(this, "siegeImage", {
+      name: "debian:latest",
+    });
+
+    //** Setup Siege Container */
+    new Container(this, "siegeContainer", {
+      name: `siege-${props.envConfig.name}`,
+      image: siegeImage.name, // Utilise une image Alpine légère
+      restart: "unless-stopped",
+      networksAdvanced: [
+        {
+          name: props.network.name,
+        },
+      ],
+      ports: [
+        {
+          internal: 8083,
+        },
+      ],
+      command: [
+        "sh",
+        "-c",
+        `apt-get update && apt-get install -y siege && sleep 30 && siege -c 10 -t 30S https://tswift.local:443`,
+      ],
     });
   }
 }
