@@ -76,8 +76,7 @@ Before you begin, ensure you have met the following requirements:
    cdktf destroy "*" --auto-approve # Destory all stacks
    ```
 
-## Setup a HTTPS Proxy with Nginx Proxy Manager
-
+## Setup HTTPS Redirection / Load Balancer with Nginx
 1. Generate a private key and a certificate :
 
     ```sh
