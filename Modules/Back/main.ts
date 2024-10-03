@@ -9,6 +9,8 @@ import { generateMaxScaleConfig } from "../../generateConfig";
 import { dirname, join } from "path";
 import path = require("path");
 import * as dotenv from "dotenv";
+
+
 dotenv.config();
 
 interface BackProps {
