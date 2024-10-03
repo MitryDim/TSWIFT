@@ -29,22 +29,23 @@ export class Back extends Construct {
     const configDir = dirname(configPath);
     mkdirSync(configDir, { recursive: true });
 
+    //** Setup Database Volume*/
+    const dbMasterVolume = new Volume(this, "dbMasterVolume", {
+      name: "db-master-volume",
+    });
+
     //** Setup Database Image */
     const dbImage = new Image(this, "dbImage", {
       name: "mariadb:latest",
       keepLocally: true,
     });
 
-    //** Setup Nginx Image */
+    //** Nginx Image */
     const nginxImage = new Image(this, "nginxImage", {
       name: "nginx:latest",
     });
 
-    //** Setup Database */
-    const dbMasterVolume = new Volume(this, "dbMasterVolume", {
-      name: "db-master-volume",
-    });
-
+    //** MaxScale Image */
     const maxscaleImage = new Image(this, "maxscaleImage", {
       name: "mariadb/maxscale:latest",
       keepLocally: true,
@@ -152,7 +153,7 @@ export class Back extends Construct {
 
     writeFileSync(configPath, config);
 
-    new Container(this, "maxscaleContainer", {
+     new Container(this, "maxscaleContainer", {
       name: "maxscale",
       image: maxscaleImage.name,
       env: [
@@ -221,6 +222,40 @@ export class Back extends Construct {
         },
       ],
       restart: "always",
+    });
+
+    //** Setup K6 Benchmark */
+    const k6Image = new Image(this, "k6-image", {
+      name: "grafana/k6:latest",
+      keepLocally: true,
+    });
+
+    new Container(this, "k6-container", {
+      image: k6Image.name,
+      name: `k6-${props.envConfig.name}`,
+      restart: "always",
+      volumes: [
+        {
+          hostPath: path.resolve(__dirname, "./config/k6-bench.js"),
+          containerPath: "/scripts/k6-bench.js",
+        },
+        {
+          containerPath: "/etc/ssl/certs", // Le chemin dans le conteneur Nginx
+          hostPath: certsPath, // Dossier local contenant tes certificats
+        },
+      ],
+      networksAdvanced: [
+        {
+          name: props.network.name,
+        },
+      ],
+      ports: [
+        {
+          internal: 6565,
+          external: 6565,
+        },
+      ],
+      command: ["run", "/scripts/k6-bench.js"],
     });
   }
 }
