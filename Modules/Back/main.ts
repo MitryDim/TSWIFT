@@ -87,7 +87,7 @@ export class Back extends Construct {
         "--log-bin=mysql-bin",
         "--binlog-format=row",
         "--gtid-domain-id=1",
-        "--log-slave-updates=1",,
+        "--log-slave-updates=1",
       ],
     });
 
