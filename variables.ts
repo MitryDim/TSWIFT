@@ -18,6 +18,9 @@ export class Variables {
   public readonly dbUser: TerraformVariable;
   public readonly rootPassword: TerraformVariable;
   public readonly dbName: TerraformVariable;
+  public readonly maxscaleAdminPassword: TerraformVariable;
+  public readonly maxscaleMonitorPassword: TerraformVariable;
+
 
   constructor(scope : Construct) {
        this.dbPassword = new TerraformVariable(scope, "db_password", {
@@ -41,6 +44,18 @@ export class Variables {
         this.dbName = new TerraformVariable(scope, "db_name", {
           description: "The name of the database",
           sensitive: false,
+          type: VariableType.STRING,
+        });
+
+        this.maxscaleAdminPassword = new TerraformVariable(scope, "maxscale_admin_password", {
+          description: "The password for the MaxScale admin user",
+          sensitive: true,
+          type: VariableType.STRING,
+        });
+
+        this.maxscaleMonitorPassword = new TerraformVariable(scope, "maxscale_monitor_password", {
+          description: "The password for the MaxScale monitor user",
+          sensitive: true,
           type: VariableType.STRING,
         });
 
