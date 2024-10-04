@@ -19,6 +19,7 @@ Before you begin, ensure you have met the following requirements:
    - [Configuration](#configuration)
 - [Setup HTTPS Redirection / Load Balancer with Nginx](#setup-https-redirection--load-balancer-with-nginx)
 - [Usage](#usage)
+- [Benchmarking](#benchmarking)
 - [Cost Analysis: A Single Server Running All Docker Containers](#cost-analysis-a-single-server-running-all-docker-containers)
 - [Project Structure](#project-structure)
 
@@ -36,9 +37,9 @@ Before you begin, ensure you have met the following requirements:
 2. Install dependencies:
 
    ```sh
-   - npm install
+   npm install
 
-   - npm get
+   npm get
    ```
 
 ### Configuration
@@ -182,9 +183,9 @@ Before you begin, ensure you have met the following requirements:
 
    ```sh
    cdktf deploy dev/staging/prod --auto-approve
-
+   ```
     or
-
+   ```sh
    cdktf deploy "*" --auto-approve # Deploy all stacks
    ```
 
@@ -192,9 +193,9 @@ Before you begin, ensure you have met the following requirements:
 
    ```sh
    cdktf destroy dev/staging/prod --auto-approve
-
+   ```
     or
-
+   ```sh
    cdktf destroy "*" --auto-approve # Destory all stacks
    ```
 
