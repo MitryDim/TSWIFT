@@ -50,7 +50,7 @@ Before you begin, ensure you have met the following requirements:
    touch terraform.tfvars # Linux
    ```
    ```sh
-   mkdir terraform.tfvars # Windows
+   echo . > terraform.tfvars # Windows
    ```
 
 2. Add your configuration to the `terraform.tfvars` file :
