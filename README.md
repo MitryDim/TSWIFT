@@ -38,7 +38,7 @@ Before you begin, ensure you have met the following requirements:
    ```sh
    - npm install
 
-   - cdktf get
+   - npm get
    ```
 
 ### Configuration
