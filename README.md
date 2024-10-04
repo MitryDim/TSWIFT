@@ -22,7 +22,6 @@ Before you begin, ensure you have met the following requirements:
 - [Setup HTTPS Redirection / Load Balancer with Nginx](#setup-https-redirection--load-balancer-with-nginx)
 - [Cost Analysis: A Single Server Running All Docker Containers](#cost-analysis-a-single-server-running-all-docker-containers)
 - [Project Structure](#project-structure)
-- [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
 
 
