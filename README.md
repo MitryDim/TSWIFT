@@ -6,10 +6,10 @@ This project is a Cloud Development Kit for Terraform (CDKTF) application writte
 
 Before you begin, ensure you have met the following requirements:
 
-- Node.js (>= 14.x)
+- [Node.js (>= 14.x)](https://nodejs.org/)
 - npm (>= 6.x)
-- Terraform (>= 0.14)
-- CDKTF (>= 0.4.0)
+- [Terraform (>= 0.14)](https://www.terraform.io/downloads.html)
+- [CDKTF (>= 0.4.0)](https://github.com/hashicorp/terraform-cdk)
 
 ## Table of Contents
 
@@ -21,7 +21,6 @@ Before you begin, ensure you have met the following requirements:
 - [Usage](#usage)
 - [Cost Analysis: A Single Server Running All Docker Containers](#cost-analysis-a-single-server-running-all-docker-containers)
 - [Project Structure](#project-structure)
-- [Acknowledgements](#acknowledgements)
 
 ## Getting Started
 
@@ -238,11 +237,10 @@ Before you begin, ensure you have met the following requirements:
 
 ## Project Structure
 
+- `certs/`: Contains the `.pem`, `.crt`, and `.key` files for SSL certificates.
 - `Modules/`: Contains the setup containers of the project, Back (Databases, Proxy, Load Balancer) and Front (Prestashop)
 - `main.ts`: The entry point of the CDKTF application.
 - `cdktf.out/`: The output directory for synthesized Terraform configuration.
-
-## Acknowledgements
-
-- [Terraform](https://www.terraform.io/)
-- [CDKTF](https://github.com/hashicorp/terraform-cdk)
+- `generateConfig.ts`: Generates MaxScale configuration.
+- `terraform.tfvars`: Contains environment-specific variables for Terraform.
+- `variables.ts`: Sets up environment variables.
