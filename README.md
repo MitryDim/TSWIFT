@@ -15,10 +15,10 @@ Before you begin, ensure you have met the following requirements:
 
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-  - [Installation](#installation)
-  - [Configuration](#configuration)
-  - [Usage](#usage)
+   - [Installation](#installation)
+   - [Configuration](#configuration)
 - [Setup HTTPS Redirection / Load Balancer with Nginx](#setup-https-redirection--load-balancer-with-nginx)
+- [Usage](#usage)
 - [Cost Analysis: A Single Server Running All Docker Containers](#cost-analysis-a-single-server-running-all-docker-containers)
 - [Project Structure](#project-structure)
 - [Acknowledgements](#acknowledgements)
@@ -89,7 +89,7 @@ Before you begin, ensure you have met the following requirements:
 
 4. Export the **".crt"** and **".key"** from the container and put them in the **"certs"** folder at the root of the project.
 
-5. Edit the nginx conf at /Modules/Back/config/nginx.conf
+5. Edit the nginx conf at `/Modules/Back/config/nginx.conf`
 
    ```sh
    # /etc/nginx/nginx.conf
@@ -170,7 +170,7 @@ Before you begin, ensure you have met the following requirements:
    127.0.0.1 example.com
    ```
 
-### Usage
+## Usage
 
 1. Synthesize the Terraform configuration :
 
