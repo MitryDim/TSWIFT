@@ -151,19 +151,20 @@ Before you begin, ensure you have met the following requirements:
       }
    }
    ```
-
-6. Add the following entry to your hosts file to map `example.com` to `127.0.0.1`:
+6. Back on your machine and add the following entry to your hosts file to map `example.com` to `127.0.0.1`:
 
    - **Windows**:
 
-     ```sh
-     notepad C:\Windows\System32\drivers\etc\hosts
-     ```
+      ```sh
+      notepad C:\Windows\System32\drivers\etc\hosts
+      ```
 
    - **Linux**:
-     ```sh
-     sudo nano /etc/hosts
-     ```
+      ```sh
+      sudo nano /etc/hosts
+      ```
+
+   Add this line:
 
    ```
    127.0.0.1 example.com
@@ -197,6 +198,16 @@ Before you begin, ensure you have met the following requirements:
    cdktf destroy "*" --auto-approve # Destory all stacks
    ```
 
+
+## Benchmarking
+
+We attempted to use several benchmarking tools to test the performance of our setup, including:
+
+- **Apache Benchmark (ab)**
+- **Siege**
+- **Grafana K6**
+
+However, we encountered connection refused errors with all of these tools. This suggests there may be an issue with the network configuration or the services not being accessible at the expected endpoints. Further investigation is required to resolve these issues before accurate benchmarking can be performed.
 
 ## Cost Analysis: A Single Server Running All Docker Containers
 
