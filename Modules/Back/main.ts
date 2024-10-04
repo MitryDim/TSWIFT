@@ -233,44 +233,44 @@ export class Back extends Construct {
       restart: "always",
     });
 
-    //** Setup K6 Benchmark */
-    const k6Image = new Image(this, "k6-image", {
-      name: "grafana/k6:latest",
-      keepLocally: true,
-    });
+    // //** Setup K6 Benchmark */
+    // const k6Image = new Image(this, "k6-image", {
+    //   name: "grafana/k6:latest",
+    //   keepLocally: true,
+    // });
 
-    new Container(this, "k6-container", {
-      image: k6Image.name,
-      name: `k6-${props.envConfig.name}`,
-      restart: "always",
-      volumes: [
-        {
-          hostPath: path.resolve(__dirname, "./config/k6-bench.js"),
-          containerPath: "/scripts/k6-bench.js",
-        },
-        {
-          containerPath: "/etc/ssl/certs", // Le chemin dans le conteneur Nginx
-          hostPath: certsPath, // Dossier local contenant tes certificats
-        },
-      ],
-      networksAdvanced: [
-        {
-          name: props.network.name,
-        },
-      ],
-      ports: [
-        {
-          internal: 6565,
-          external: 6565,
-        },
-      ],
-      command: [
-        "run",
-        "--http-debug",
-        "--insecure-skip-tls-verify",
-        "/scripts/k6-bench.js",
-      ],
-      user: "root",
-    });
+    // new Container(this, "k6-container", {
+    //   image: k6Image.name,
+    //   name: `k6-${props.envConfig.name}`,
+    //   restart: "always",
+    //   volumes: [
+    //     {
+    //       hostPath: path.resolve(__dirname, "./config/k6-bench.js"),
+    //       containerPath: "/scripts/k6-bench.js",
+    //     },
+    //     {
+    //       containerPath: "/etc/ssl/certs", // Le chemin dans le conteneur Nginx
+    //       hostPath: certsPath, // Dossier local contenant tes certificats
+    //     },
+    //   ],
+    //   networksAdvanced: [
+    //     {
+    //       name: props.network.name,
+    //     },
+    //   ],
+    //   ports: [
+    //     {
+    //       internal: 6565,
+    //       external: 6565,
+    //     },
+    //   ],
+    //   command: [
+    //     "run",
+    //     "--http-debug",
+    //     "--insecure-skip-tls-verify",
+    //     "/scripts/k6-bench.js",
+    //   ],
+    //   user: "root",
+    // });
   }
 }
