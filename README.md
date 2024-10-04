@@ -39,7 +39,7 @@ Before you begin, ensure you have met the following requirements:
    ```sh
    npm install
 
-   npm get
+   cdktf get
    ```
 
 ### Configuration
