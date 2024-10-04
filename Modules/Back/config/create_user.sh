@@ -1,6 +1,4 @@
 #!/bin/bash
-
-
 # Utiliser les variables d'environnement injectées par CDKTF
 mariadb -uroot -p${MYSQL_ROOT_PASSWORD} <<-EOSQL
 CREATE USER IF NOT EXISTS 'maxscale_admin'@'%' IDENTIFIED BY '${MAXSCALE_ADMIN_PASSWORD}';
