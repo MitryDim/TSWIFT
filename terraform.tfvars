@@ -1,8 +1,0 @@
-db_password = "prestashop"
-db_user = "admin"
-db_root_password = "rootPrestashop"
-db_name = "prestashop"
-maxscale_admin_password="maxscaleAdminPassword"
-maxscale_monitor_password="MaxScaleMonitorPassword"
-prestashop_admin_email="test@test.com"
-prestashop_admin_password="test@test.com"
