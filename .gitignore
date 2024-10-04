@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 .vscode
 terraform.tfvars
 certs
+Modules/Back/config/create_user.sh

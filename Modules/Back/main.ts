@@ -4,8 +4,8 @@ import { Image } from "../../.gen/providers/docker/image";
 import { Network } from "../../.gen/providers/docker/network";
 import { Variables } from "../../variables";
 import { Volume } from "../../.gen/providers/docker/volume";
-import { mkdirSync, writeFileSync } from "fs";
-import { generateMaxScaleConfig } from "../../generateConfig";
+import { chmodSync, mkdirSync, writeFileSync } from "fs";
+import { generateMariaDbUserConfig, generateMaxScaleConfig } from "../../generateConfig";
 import { dirname, join } from "path";
 import path = require("path");
 import * as dotenv from "dotenv";
@@ -50,6 +50,15 @@ export class Back extends Construct {
       name: "mariadb/maxscale:latest",
       keepLocally: true,
     });
+
+    const mariaDBConfig = generateMariaDbUserConfig();
+
+    // Écriture dans le fichier create_user.sh
+    const filePath = path.resolve(__dirname, "./config/create_user.sh");
+    writeFileSync(filePath, mariaDBConfig);
+
+    // Rendre le script exécutable
+    chmodSync(filePath, 0o755); // chmod +x create_user.sh
 
     const sqlConfig = path.resolve(__dirname, "./config/create_user.sh");
 
@@ -153,7 +162,7 @@ export class Back extends Construct {
 
     writeFileSync(configPath, config);
 
-     new Container(this, "maxscaleContainer", {
+    new Container(this, "maxscaleContainer", {
       name: "maxscale",
       image: maxscaleImage.name,
       env: [
