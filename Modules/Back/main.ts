@@ -255,7 +255,13 @@ export class Back extends Construct {
           external: 6565,
         },
       ],
-      command: ["run", "/scripts/k6-bench.js"],
+      command: [
+        "run",
+        "--http-debug",
+        "--insecure-skip-tls-verify",
+        "/scripts/k6-bench.js",
+      ],
+      user: "root",
     });
   }
 }
