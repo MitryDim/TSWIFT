@@ -11,20 +11,17 @@ Before you begin, ensure you have met the following requirements:
 - Terraform (>= 0.14)
 - CDKTF (>= 0.4.0)
 
-
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-   - [Installation](#installation)
-   - [Configuration](#configuration)
-   - [Usage](#usage)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Usage](#usage)
 - [Setup HTTPS Redirection / Load Balancer with Nginx](#setup-https-redirection--load-balancer-with-nginx)
 - [Cost Analysis: A Single Server Running All Docker Containers](#cost-analysis-a-single-server-running-all-docker-containers)
 - [Project Structure](#project-structure)
 - [Acknowledgements](#acknowledgements)
-
-
 
 ## Getting Started
 
@@ -65,34 +62,6 @@ Before you begin, ensure you have met the following requirements:
     maxscale_monitor_password = "your-maxscale-monitor-password"
     prestashop_admin_email    = "your-prestashop-admin-email"
     prestashop_admin_password = "your-prestashop-admin-password"
-   ```
-
-### Usage
-
-1. Synthesize the Terraform configuration :
-
-   ```sh
-   cdktf synth
-   ```
-
-2. Deploy the stack you want :
-
-   ```sh
-   cdktf deploy dev/staging/prod --auto-approve
-
-    or
-
-   cdktf deploy "*" --auto-approve # Deploy all stacks
-   ```
-
-3. Destroy the stack you want :
-
-   ```sh
-   cdktf destroy dev/staging/prod --auto-approve
-
-    or
-
-   cdktf destroy "*" --auto-approve # Destory all stacks
    ```
 
 ## Setup HTTPS Redirection / Load Balancer with Nginx
@@ -187,33 +156,65 @@ Before you begin, ensure you have met the following requirements:
 6. Add the following entry to your hosts file to map `example.com` to `127.0.0.1`:
 
    - **Windows**:
-      ```sh
-      notepad C:\Windows\System32\drivers\etc\hosts
-      ```
+
+     ```sh
+     notepad C:\Windows\System32\drivers\etc\hosts
+     ```
 
    - **Linux**:
-      ```sh
-      sudo nano /etc/hosts
-      ```
+     ```sh
+     sudo nano /etc/hosts
+     ```
 
    ```
    127.0.0.1 example.com
+   ```
+
+### Usage
+
+1. Synthesize the Terraform configuration :
+
+   ```sh
+   cdktf synth
+   ```
+
+2. Deploy the stack you want :
+
+   ```sh
+   cdktf deploy dev/staging/prod --auto-approve
+
+    or
+
+   cdktf deploy "*" --auto-approve # Deploy all stacks
+   ```
+
+3. Destroy the stack you want :
+
+   ```sh
+   cdktf destroy dev/staging/prod --auto-approve
+
+    or
+
+   cdktf destroy "*" --auto-approve # Destory all stacks
    ```
 
 
 ## Cost Analysis: A Single Server Running All Docker Containers
 
 ### 1. Server Resources
+
 - **CPU**: 4 vCPUs
 - **Memory (RAM)**: 16 GB RAM
 - **Storage**: SSD of 200 GB (enough for databases and PrestaShop files)
 - **Network Traffic**: Based on traffic demands
 
 ### 2. SSL Certificate
+
 - **Let's Encrypt**: Free
 - **Commercial Certificate**: Around $5 to $10/month
 
 ### 3. Server Cost Estimation
+
 - **Cloud or Dedicated Server**:
   - Server with 4 vCPUs, 16 GB RAM, 200 GB SSD
   - Cost: Around $40 to $80/month (e.g., DigitalOcean, AWS)
@@ -222,18 +223,18 @@ Before you begin, ensure you have met the following requirements:
 
 ### Monthly Cost Summary
 
-| Resource                  | Estimated Cost                    |
-|---------------------------|------------------------------------|
-| Server (4 vCPUs, 16 GB RAM, 200 GB SSD) | $40 - $80/month                |
-| SSL Certificate            | Free (Let's Encrypt) or $5 - $10/month |
-| Additional Storage         | $0.10 to $0.20/GB (if necessary)  |
+| Resource                                | Estimated Cost                         |
+| --------------------------------------- | -------------------------------------- |
+| Server (4 vCPUs, 16 GB RAM, 200 GB SSD) | $40 - $80/month                        |
+| SSL Certificate                         | Free (Let's Encrypt) or $5 - $10/month |
+| Additional Storage                      | $0.10 to $0.20/GB (if necessary)       |
 
 ### Total Estimated Monthly Cost
+
 - **Without Commercial SSL**: $40 - $80/month
 - **With Commercial SSL**: $45 - $90/month
 
 > **Note**: These costs may vary depending on the cloud provider and traffic demands.
-
 
 ## Project Structure
 
