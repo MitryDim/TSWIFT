@@ -28,7 +28,7 @@ export class Front extends Construct {
     });
 
 
-    for (let i = 1; i <= 2; i++) {
+    for (let i = 1; i <= props.envConfig.PrestashopReplicas; i++) {
       const port = 8080 + i;
       new Container(this, `prestashopContainer${i}`, {
         name: `prestashop-${props.envConfig.name}-${i}`,
@@ -43,8 +43,8 @@ export class Front extends Construct {
           `PS_ERASE_DB=0`, // Supprimer la base de données existante
           `PS_INSTALL_DB=0`, // Installer la base de données
           "DB_PREFIX=ps_", // Préfixe des tables
-          "PS_LANGUAGE=fr", 
-          "PS_COUNTRY=fr", 
+          "PS_LANGUAGE=fr",
+          "PS_COUNTRY=fr",
           "PS_DEV_MODE=0", // Mode développement
           "PS_DOMAIN=tswift.local", // Domaine de l'application
           "PS_ENABLE_SSL=1", // Utilisation SSL
