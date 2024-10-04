@@ -48,7 +48,8 @@ Before you begin, ensure you have met the following requirements:
 
    ```sh
    touch terraform.tfvars # Linux
-
+   ```
+   ```sh
    mkdir terraform.tfvars # Windows
    ```
 
