@@ -248,6 +248,12 @@ However, we encountered connection refused errors with all of these tools. This 
 
 > **Note**: These costs may vary depending on the cloud provider and traffic demands.
 
+## Cost Estimation AWS
+
+To estimate the cost of running this setup on AWS, you can use the [AWS Pricing Calculator](https://calculator.aws/#/). Below is a general guideline for the resources you might need:
+
+Our Estimation : [AWS Estimation](./TSWIFT%20Estimation%20-%20AWS%20Pricing%20Calculator.pdf)
+
 ## Project Structure
 
 - `certs/`: Contains the `.pem`, `.crt`, and `.key` files for SSL certificates.
