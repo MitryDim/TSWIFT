@@ -250,7 +250,7 @@ However, we encountered connection refused errors with all of these tools. This 
 
 ## Cost Estimation AWS
 
-To estimate the cost of running this setup on AWS, you can use the [AWS Pricing Calculator](https://calculator.aws/#/). Below is a general guideline for the resources you might need:
+To estimate the cost of running this setup on AWS, you can use the [AWS Pricing Calculator](https://calculator.aws/#/).
 
 Our Estimation : [AWS Estimation](./TSWIFT%20Estimation%20-%20AWS%20Pricing%20Calculator.pdf)
 
